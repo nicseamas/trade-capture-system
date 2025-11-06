@@ -44,11 +44,12 @@ public class TradeDTO {
 
     // Book reference
     private Long bookId;
+    @jakarta.validation.constraints.NotBlank(message = "Book name is required")
     private String bookName;
 
     // Counterparty reference
     private Long counterpartyId;
-    @NotNull(message = "Counterparty name is required")
+    @jakarta.validation.constraints.NotBlank(message = "Counterparty name is required")
     private String counterpartyName;
 
     // User references

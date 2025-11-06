@@ -76,7 +76,7 @@ public class TradeController {
     @Operation(summary = "Create new trade",
                description = "Creates a new trade with the provided details. Automatically generates cashflows and validates business rules.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Trade created successfully",
+        @ApiResponse(responseCode = "200", description = "Trade created successfully",
                     content = @Content(mediaType = "application/json",
                                      schema = @Schema(implementation = TradeDTO.class))),
         @ApiResponse(responseCode = "400", description = "Invalid trade data or business rule violation"),
@@ -86,16 +86,13 @@ public class TradeController {
             @Parameter(description = "Trade details for creation", required = true)
             @Valid @RequestBody TradeDTO tradeDTO) {
         logger.info("Creating new trade: {}", tradeDTO);
-        try {
+        
             Trade trade = tradeMapper.toEntity(tradeDTO);
             tradeService.populateReferenceDataByName(trade, tradeDTO);
             Trade savedTrade = tradeService.saveTrade(trade, tradeDTO);
             TradeDTO responseDTO = tradeMapper.toDto(savedTrade);
             return ResponseEntity.ok(responseDTO);
-        } catch (Exception e) {
-            logger.error("Error creating trade: {}", e.getMessage(), e);
-            return ResponseEntity.badRequest().body("Error creating trade: " + e.getMessage());
-        }
+       
     }
 
     @PutMapping("/{id}")
