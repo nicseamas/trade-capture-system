@@ -85,6 +85,73 @@ git clone https://github.com/YOUR_USERNAME/trade-capture-system.git
 cd trade-capture-system
 ```
 
+#### GitHub Codespaces Setup (Alternative)
+
+If you're using GitHub Codespaces instead of a local development environment, follow these additional steps:
+
+##### 1. Port Forwarding Configuration
+1. **Forward Required Ports**: In your Codespace, forward both ports 5173 and 8080
+2. **Make Ports Public**: Ensure both ports are set to "Public" visibility
+   - Port 5173: Frontend application
+   - Port 8080: Backend API and Swagger UI
+
+##### 2. Frontend Configuration
+Create a `.env` file in the `frontend` directory:
+```bash
+# Navigate to frontend directory
+cd frontend
+
+# Create .env file
+touch .env
+```
+
+Add the following content to `frontend/.env`:
+```properties
+# Replace YOUR_CODESPACE_ID with your actual Codespace ID
+# The URL format is: https://YOUR_CODESPACE_ID-8080.app.github.dev
+VITE_API_BASE_URL=https://YOUR_CODESPACE_ID-8080.app.github.dev
+```
+
+##### 3. Backend Configuration
+Create a `local.properties` file in the `backend` directory:
+```bash
+# Navigate to backend directory
+cd backend
+
+# Create local.properties file
+touch local.properties
+```
+
+Add the following content to `backend/local.properties`:
+```properties
+# Replace YOUR_CODESPACE_ID with your actual Codespace ID
+# Frontend URL (port 5173)
+management.endpoints.web.cors.allowed-origins=https://YOUR_CODESPACE_ID-5173.app.github.dev
+# Backend URL (port 8080) for Swagger UI
+springdoc.swagger-ui.server-url=https://YOUR_CODESPACE_ID-8080.app.github.dev
+```
+
+##### 4. Finding Your Codespace ID
+Your Codespace ID can be found in the URL when you access your Codespace. The format is:
+- **Codespace URL**: `https://YOUR_CODESPACE_ID-8080.app.github.dev`
+- **Your ID**: The part before `-8080.app.github.dev`
+
+##### 5. Codespaces URL Changes
+When using GitHub Codespaces, the following URLs in this documentation will change:
+
+**Standard Local URLs** → **Codespaces URLs**:
+- `http://localhost:8080` → `https://YOUR_CODESPACE_ID-8080.app.github.dev`
+- `http://localhost:5173` → `https://YOUR_CODESPACE_ID-5173.app.github.dev`
+- `http://localhost:8080/swagger-ui/index.html` → `https://YOUR_CODESPACE_ID-8080.app.github.dev/swagger-ui/index.html`
+- `http://localhost:8080/h2-console` → `https://YOUR_CODESPACE_ID-8080.app.github.dev/h2-console`
+- `http://localhost:8080/actuator/health` → `https://YOUR_CODESPACE_ID-8080.app.github.dev/actuator/health`
+
+**Important Notes for Codespaces Users**:
+- Replace `YOUR_CODESPACE_ID` with your actual Codespace identifier in all configuration files
+- Both ports must be set to "Public" for external access
+- The Codespace URLs are automatically generated and will be different for each user
+- You can find your Codespace URLs in the "Ports" tab of your Codespace interface
+
 ### Step 2: Backend Setup
 
 #### Navigate to Backend Directory
@@ -178,21 +245,20 @@ npm run preview  # Preview production build
 
 #### Verify Frontend is Running
 - **Application URL**: Check terminal for actual port assignment
-  - **npm (Vite)**: Typically http://localhost:5173 
-  - **pnpm (Vite)**: Typically http://localhost:3000
+  - Defaults to http://localhost:5173 
 - **Should automatically open in browser**
-- **Note**: The frontend uses Vite, which will automatically assign an available port if the default is busy
-- **CORS Configuration**: Backend is pre-configured to accept requests from both ports (3000 and 5173)
+- **Note**: The frontend uses Vite, which will automatically assign the next available port if the default is busy
+- **CORS Configuration**: Backend is pre-configured to accept requests from port `5173`
 
 ### Step 4: Verify Full Application
 
 #### Check Both Services are Running
-- **Frontend**: http://localhost:3000
+- **Frontend**: http://localhost:5173
 - **Backend API**: http://localhost:8080
 - **Database Console**: http://localhost:8080/h2-console
 
 #### Test Basic Functionality
-1. **Access the Application**: Navigate to http://localhost:3000
+1. **Access the Application**: Navigate to http://localhost:5173
 2. **Login/Register**: Create a user account or use existing credentials
 3. **Explore Features**: Navigate through available trading functionalities
 4. **API Testing**: Use browser developer tools to verify API calls
@@ -314,16 +380,16 @@ rm -rf node_modules pnpm-lock.yaml
 npm install
 ```
 
-**Issue**: `Port 3000 already in use`
-**Solution**: Kill the process using port 3000 or Vite will automatically use the next available port:
+**Issue**: `Port 5173 already in use`
+**Solution**: Kill the process using port 5173 or Vite will automatically use the next available port, requiring you to re-configure CORS in the backend:
 ```bash
-# For npm
-PORT=3001 npm run dev  # Linux/macOS
-set PORT=3001 && npm run dev  # Windows
-
 # For pnpm  
-PORT=3001 pnpm dev  # Linux/macOS
-set PORT=3001 && pnpm dev  # Windows
+PORT=5174 pnpm dev  # Linux/macOS
+set PORT=5174 && pnpm dev  # Windows
+
+# For npm
+PORT=5174 npm run dev  # Linux/macOS
+set PORT=5174 && npm run dev  # Windows
 ```
 
 #### Database Issues
@@ -357,15 +423,22 @@ set PORT=3001 && pnpm dev  # Windows
 
 **Issue**: CORS errors in browser console
 **Solutions**:
-1. **Default Configuration**: Backend is pre-configured for both common Vite ports
-   - Supports `http://localhost:3000` (typical pnpm default)
-   - Supports `http://localhost:5173` (typical npm default)
-2. **Custom Port Usage**: If using a different port, update CORS configuration in `backend/src/main/java/com/technicalchallenge/config/WebConfig.java`
-3. **Configuration Location**: 
-   ```java
-   // In WebConfig.java
-   .allowedOrigins("http://localhost:3000", "http://localhost:5173")
-   ```
+1. **Default Configuration**: Backend is pre-configured for standard Vite port
+   - Supports `http://localhost:5173`
+2. **Custom Port Usage**: If using a different port or URL (e.g. from GitHub CodeSpaces), create an override file at `backend/src/main/resources/local.properties` and add your frontend URL, along with the backend URL for the Swagger UI:
+```properties
+# In local.properties
+# Frontend URL, using port 5173
+management.endpoints.web.cors.allowed-origins=https://my-codespace-id-5173.app.github.dev
+# Backend URL, using port 8080
+springdoc.swagger-ui.server-url=https://my-codespace-id-8080.app.github.dev
+```
+3. **Configuration Location**: Create a .env file at `frontend/.env` and add your frontend URL:
+```properties
+# In .env
+# Backend URL, using port 8080
+VITE_API_BASE_URL=https://my-codespace-id-8080.app.github.dev
+```
 
 ## Testing the Setup
 

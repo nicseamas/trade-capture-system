@@ -1,25 +1,30 @@
 package com.technicalchallenge.controller;
 
-import com.technicalchallenge.dto.BookDTO;
-import com.technicalchallenge.mapper.BookMapper;
-import com.technicalchallenge.model.Book;
-import com.technicalchallenge.service.BookService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
-
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.technicalchallenge.dto.BookDTO;
+import com.technicalchallenge.service.BookService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/books")
 @Validated
+@Tag(name = "Books", description = "Trading book management for organizing trades by desk/strategy")
 public class BookController {
     private static final Logger logger = LoggerFactory.getLogger(BookController.class);
 

@@ -1,15 +1,15 @@
 package com.technicalchallenge.service;
 
-import com.technicalchallenge.model.UserPrivilege;
-import com.technicalchallenge.repository.UserPrivilegeRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.technicalchallenge.model.UserPrivilege;
+import com.technicalchallenge.model.UserPrivilegeId;
+import com.technicalchallenge.repository.UserPrivilegeRepository;
 
 @Service
 public class UserPrivilegeService {
@@ -23,18 +23,18 @@ public class UserPrivilegeService {
         return userPrivilegeRepository.findAll();
     }
 
-    public Optional<UserPrivilege> getUserPrivilegeById(Long id) {
-        logger.debug("Retrieving user privilege by id: {}", id);
-        return userPrivilegeRepository.findById(id);
+    public List<UserPrivilege> getUserPrivileges(Long userId) {
+        logger.debug("Retrieving privileges for user: {}", userId);
+        return userPrivilegeRepository.findByUserId(userId);
     }
 
     public UserPrivilege saveUserPrivilege(UserPrivilege userPrivilege) {
-        logger.info("Saving user privilege: {}", userPrivilege);
+        logger.info("Saving user privilege: {userId={}, privilegeId={}}", userPrivilege.getUserId(), userPrivilege.getPrivilegeId());
         return userPrivilegeRepository.save(userPrivilege);
     }
 
-    public void deleteUserPrivilege(Long id) {
-        logger.warn("Deleting user privilege with id: {}", id);
+    public void deleteUserPrivilege(UserPrivilegeId id) {
+        logger.warn("Deleting user privilege: {userId={}, privilegeId={}}", id.getUserId(), id.getPrivilegeId());
         userPrivilegeRepository.deleteById(id);
     }
 }
