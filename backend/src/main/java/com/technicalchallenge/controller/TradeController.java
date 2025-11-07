@@ -112,16 +112,19 @@ public class TradeController {
             @Parameter(description = "Updated trade details", required = true)
             @Valid @RequestBody TradeDTO tradeDTO) {
         logger.info("Updating trade with id: {}", id);                                          
-        try {
-            tradeDTO.setTradeId(id); // Ensure the ID matches
-            
-            Trade trade = tradeMapper.toEntity(tradeDTO);
-            tradeService.populateReferenceDataByName(trade, tradeDTO);
-            Trade updatedTrade = tradeService.saveTrade(trade, tradeDTO);
+        try{
+      
+        if (!id.equals(tradeDTO.getTradeId())) {
+            return ResponseEntity.badRequest()
+                .body("Trade ID in path must match Trade ID in request body");
+        }
         
-            TradeDTO responseDTO = tradeMapper.toDto(updatedTrade);
-            return ResponseEntity.ok(responseDTO);
-        } catch (Exception e) {
+        Trade trade = tradeMapper.toEntity(tradeDTO);
+        tradeService.populateReferenceDataByName(trade, tradeDTO);
+        Trade updatedTrade = tradeService.saveTrade(trade, tradeDTO);
+        TradeDTO responseDTO = tradeMapper.toDto(updatedTrade);
+        return ResponseEntity.ok(responseDTO);
+    } catch (Exception e) {
             logger.error("Error updating trade: {}", e.getMessage(), e);
             return ResponseEntity.badRequest().body("Error updating trade: " + e.getMessage());
         }
