@@ -1,25 +1,32 @@
 package com.technicalchallenge.controller;
 
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.technicalchallenge.dto.SubDeskDTO;
 import com.technicalchallenge.mapper.SubDeskMapper;
 import com.technicalchallenge.model.SubDesk;
 import com.technicalchallenge.service.SubDeskService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-
-import java.util.List;
-import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/subdesks")
 @Validated
+@Tag(name = "Sub-Desks", description = "Sub-desk management for detailed organizational breakdown")
 public class SubDeskController {
     private static final Logger logger = LoggerFactory.getLogger(SubDeskController.class);
 

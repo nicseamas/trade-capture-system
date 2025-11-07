@@ -1,14 +1,26 @@
 package com.technicalchallenge.controller;
 
-import com.technicalchallenge.dto.TradeDTO;
-import com.technicalchallenge.mapper.TradeMapper;
-import com.technicalchallenge.model.Trade;
-import com.technicalchallenge.service.TradeService;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.technicalchallenge.dto.TradeDTO;
+import com.technicalchallenge.mapper.TradeMapper;
+import com.technicalchallenge.model.Trade;
+import com.technicalchallenge.service.TradeService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,12 +29,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.validation.Valid;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/trades")
@@ -64,7 +71,7 @@ public class TradeController {
     })
     public ResponseEntity<TradeDTO> getTradeById(
             @Parameter(description = "Unique identifier of the trade", required = true)
-            @PathVariable(name = "id") Long id) {
+            @PathVariable Long id) {
         logger.debug("Fetching trade by id: {}", id);
         return tradeService.getTradeById(id)
                 .map(tradeMapper::toDto)
@@ -76,7 +83,7 @@ public class TradeController {
     @Operation(summary = "Create new trade",
                description = "Creates a new trade with the provided details. Automatically generates cashflows and validates business rules.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Trade created successfully",
+        @ApiResponse(responseCode = "200", description = "Trade created successfully",
                     content = @Content(mediaType = "application/json",
                                      schema = @Schema(implementation = TradeDTO.class))),
         @ApiResponse(responseCode = "400", description = "Invalid trade data or business rule violation"),
@@ -86,16 +93,13 @@ public class TradeController {
             @Parameter(description = "Trade details for creation", required = true)
             @Valid @RequestBody TradeDTO tradeDTO) {
         logger.info("Creating new trade: {}", tradeDTO);
-        try {
+        
             Trade trade = tradeMapper.toEntity(tradeDTO);
             tradeService.populateReferenceDataByName(trade, tradeDTO);
             Trade savedTrade = tradeService.saveTrade(trade, tradeDTO);
             TradeDTO responseDTO = tradeMapper.toDto(savedTrade);
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
-        } catch (Exception e) {
-            logger.error("Error creating trade: {}", e.getMessage(), e);
-            return ResponseEntity.badRequest().body("Error creating trade: " + e.getMessage());
-        }
+            return ResponseEntity.ok(responseDTO);
+       
     }
 
     @PutMapping("/{id}")
@@ -114,13 +118,20 @@ public class TradeController {
             @PathVariable Long id,
             @Parameter(description = "Updated trade details", required = true)
             @Valid @RequestBody TradeDTO tradeDTO) {
-        logger.info("Updating trade with id: {}", id);
-        try {
-            tradeDTO.setTradeId(id); // Ensure the ID matches
-            Trade amendedTrade = tradeService.amendTrade(id, tradeDTO);
-            TradeDTO responseDTO = tradeMapper.toDto(amendedTrade);
-            return ResponseEntity.ok(responseDTO);
-        } catch (Exception e) {
+        logger.info("Updating trade with id: {}", id);                                          
+        try{
+      
+        if (!id.equals(tradeDTO.getTradeId())) {
+            return ResponseEntity.badRequest()
+                .body("Trade ID in path must match Trade ID in request body");
+        }
+        
+        Trade trade = tradeMapper.toEntity(tradeDTO);
+        tradeService.populateReferenceDataByName(trade, tradeDTO);
+        Trade updatedTrade = tradeService.saveTrade(trade, tradeDTO);
+        TradeDTO responseDTO = tradeMapper.toDto(updatedTrade);
+        return ResponseEntity.ok(responseDTO);
+    } catch (Exception e) {
             logger.error("Error updating trade: {}", e.getMessage(), e);
             return ResponseEntity.badRequest().body("Error updating trade: " + e.getMessage());
         }
@@ -130,7 +141,7 @@ public class TradeController {
     @Operation(summary = "Delete trade",
                description = "Deletes an existing trade. This is a soft delete that changes the trade status.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Trade deleted successfully"),
+        @ApiResponse(responseCode = "204", description = "Trade deleted successfully"),
         @ApiResponse(responseCode = "404", description = "Trade not found"),
         @ApiResponse(responseCode = "400", description = "Trade cannot be deleted in current status"),
         @ApiResponse(responseCode = "403", description = "Insufficient privileges to delete trade")
@@ -141,7 +152,7 @@ public class TradeController {
         logger.info("Deleting trade with id: {}", id);
         try {
             tradeService.deleteTrade(id);
-            return ResponseEntity.ok().body("Trade cancelled successfully");
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             logger.error("Error deleting trade: {}", e.getMessage(), e);
             return ResponseEntity.badRequest().body("Error deleting trade: " + e.getMessage());

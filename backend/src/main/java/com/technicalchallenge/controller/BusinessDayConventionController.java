@@ -1,18 +1,28 @@
 package com.technicalchallenge.controller;
 
-import com.technicalchallenge.model.BusinessDayConvention;
-import com.technicalchallenge.service.BusinessDayConventionService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.technicalchallenge.model.BusinessDayConvention;
+import com.technicalchallenge.service.BusinessDayConventionService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/businessDayConventions")
+@Tag(name = "Business Day Conventions", description = "Business day convention reference data for date calculations")
 public class BusinessDayConventionController {
     private static final Logger logger = LoggerFactory.getLogger(BusinessDayConventionController.class);
 

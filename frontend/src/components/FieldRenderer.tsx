@@ -1,18 +1,18 @@
 import React from "react";
-import Input from "./Input";
 import Dropdown from "./Dropdown";
+import Input from "./Input";
 
 /**
  * Props for the FieldRenderer component
  */
-export interface FieldRendererProps {
+interface FieldRendererProps {
     field: {
         key: string;
         label: string;
         type: string;
         options?: (() => { value: string; label: string }[] | string[]) | { value: string; label: string }[] | string[]
     };
-    value: string | number | undefined | null;
+    value: unknown | string | number | undefined | null;
     disabled: boolean;
     onChange: (e: React.ChangeEvent<HTMLInputElement> | string) => void;
 }
@@ -55,7 +55,7 @@ const FieldRenderer: React.FC<FieldRendererProps> = ({field, value, disabled, on
         <Input
             size="md"
             value={typeof value === 'string' || typeof value === 'number' ? value.toString() : ""}
-            onChange={onChange}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
             type={field.type === "date" ? "date" : "text"}
             disabled={disabled}
             className={commonClass}
