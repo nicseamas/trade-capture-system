@@ -1,17 +1,16 @@
-import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-// @ts-expect-error - avatar might not be found
-import avatar from '../assets/avatar.svg'
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import avatar from '../assets/avatar.svg';
 import Button from '../components/Button';
 import Input from '../components/Input';
-import {authenticate,getUserByLogin} from "../utils/api";
+import LoadingSpinner from "../components/LoadingSpinner";
 import Snackbar from "../components/Snackbar";
 import userStore from "../stores/userStore";
-import LoadingSpinner from "../components/LoadingSpinner";
+import { authenticate, getUserByLogin } from "../utils/api";
 import SignUp from './SignUp';
 
 const SignIn = () => {
-    const [email, setEmail] = useState<string>('');
+    const [loginId, setLoginId] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const navigate = useNavigate();
     const [isSnackBarOpen, setIsSnackBarOpen] = React.useState(false);
@@ -23,16 +22,18 @@ const SignIn = () => {
         setLoading(true)
         e.preventDefault();
         try {
-            const authRes = await authenticate(email, password);
+            const authRes = await authenticate(loginId, password);
             if (authRes.status === 200) {
                 localStorage.setItem("authenticated", "true");
                 sessionStorage.setItem("authenticated", "true")
-                const userRes = await getUserByLogin(email);
+                const userRes = await getUserByLogin(loginId);
                 if (userRes.status === 200) {
                     const user = userRes.data;
                     userStore.user = user;
                     userStore.authorization = user.userProfile;
                     userStore.isLoading = false;
+                    localStorage.setItem('user', JSON.stringify(user));
+                    localStorage.setItem('userProfile', user.userProfile);
                     console.log("User details fetched successfully:", user);
                     console.log("User profile:", userStore.authorization);
                     setLoading(false)
@@ -71,14 +72,14 @@ const SignIn = () => {
                          src={avatar} alt="avatar"/>
                     <Input
                         type="userid"
-                        name="email"
-                        label="Email"
+                        name="loginId"
+                        label="Login Id"
                         required
                         variant="primary"
                         size="md"
                         autoComplete="username"
-                        value={email}
-                        onChange={e => setEmail(e.target.value)}
+                        value={loginId}
+                        onChange={e => setLoginId(e.target.value)}
                     />
                     <Input
                         type="password"

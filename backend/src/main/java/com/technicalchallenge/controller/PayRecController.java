@@ -1,20 +1,30 @@
 package com.technicalchallenge.controller;
 
-import com.technicalchallenge.dto.PayRecDTO;
-import com.technicalchallenge.mapper.PayRecMapper;
-import com.technicalchallenge.model.PayRec;
-import com.technicalchallenge.service.PayRecService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.technicalchallenge.dto.PayRecDTO;
+import com.technicalchallenge.mapper.PayRecMapper;
+import com.technicalchallenge.model.PayRec;
+import com.technicalchallenge.service.PayRecService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/payRecs")
+@Tag(name = "Pay/Receive Flags", description = "Payment direction reference data for trade legs")
 public class PayRecController {
     private static final Logger logger = LoggerFactory.getLogger(PayRecController.class);
 

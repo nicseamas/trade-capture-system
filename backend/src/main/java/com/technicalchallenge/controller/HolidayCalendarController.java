@@ -1,20 +1,30 @@
 package com.technicalchallenge.controller;
 
-import com.technicalchallenge.dto.HolidayCalendarDTO;
-import com.technicalchallenge.mapper.HolidayCalendarMapper;
-import com.technicalchallenge.model.HolidayCalendar;
-import com.technicalchallenge.service.HolidayCalendarService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.technicalchallenge.dto.HolidayCalendarDTO;
+import com.technicalchallenge.mapper.HolidayCalendarMapper;
+import com.technicalchallenge.model.HolidayCalendar;
+import com.technicalchallenge.service.HolidayCalendarService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/holidayCalendars")
+@Tag(name = "Holiday Calendars", description = "Holiday calendar management for business day calculations")
 public class HolidayCalendarController {
     private static final Logger logger = LoggerFactory.getLogger(HolidayCalendarController.class);
 
